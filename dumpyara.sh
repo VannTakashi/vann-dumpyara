@@ -115,7 +115,7 @@ else
     fi
 fi
 
-ORG=AndroidDumps #your GitHub org name
+ORG=Xiaomeme-ROMs-Dumps #your GitHub org name
 EXTENSION=$(echo "${INPUT##*.}" | inline-detox)
 UNZIP_DIR=$(basename ${INPUT/.$EXTENSION/})
 WORKING=${PWD}/working/${UNZIP_DIR}
@@ -484,10 +484,10 @@ if [[ -n $GIT_OAUTH_TOKEN ]]; then
     curl --silent --fail "https://raw.githubusercontent.com/$ORG/$repo/$branch/all_files.txt" 2> /dev/null && echo "Firmware already dumped!" && exit 1
     git init
     if [[ -z "$(git config --get user.email)" ]]; then
-        git config user.email AndroidDumps@github.com
+        git config user.email vannxaveroo@proton.me
     fi
     if [[ -z "$(git config --get user.name)" ]]; then
-        git config user.name AndroidDumps
+        git config user.name VannXaveroo
     fi
     curl -s -X POST -H "Authorization: token ${GIT_OAUTH_TOKEN}" -d '{ "name": "'"$repo"'" }' "https://api.github.com/orgs/${ORG}/repos" #create new repo
     curl -s -X PUT -H "Authorization: token ${GIT_OAUTH_TOKEN}" -H "Accept: application/vnd.github.mercy-preview+json" -d '{ "names": ["'"$manufacturer"'","'"$platform"'","'"$top_codename"'"]}' "https://api.github.com/repos/${ORG}/${repo}/topics"
@@ -520,13 +520,13 @@ else
 fi
 
 # Telegram channel
-TG_TOKEN=$(< "$PWD"/.tgtoken)
+TG_TOKEN=$(< ~/dumpyara/.tgtoken)
 if [[ -n "$TG_TOKEN" ]]; then
-    CHAT_ID="@android_dumps"
+    CHAT_ID="@dumpervann"
     commit_head=$(git log --format=format:%H | head -n 1)
     commit_link="https://github.com/$ORG/$repo/commit/$commit_head"
     echo -e "Sending telegram notification"
-    printf "<b>Brand: %s</b>" "$brand" >| "$PWD"/working/tg.html
+    printf "<b>Brand: %s</b>" "$brand" >| ~/dumpyara/tg.html
     {
         printf "\n<b>Device: %s</b>" "$codename"
         printf "\n<b>Version:</b> %s" "$release"
@@ -534,8 +534,8 @@ if [[ -n "$TG_TOKEN" ]]; then
         printf "\n<b>GitHub:</b>"
         printf "\n<a href=\"%s\">Commit</a>" "$commit_link"
         printf "\n<a href=\"https://github.com/%s/%s/tree/%s/\">%s</a>" "$ORG" "$repo" "$branch" "$codename"
-    } >> "$PWD"/working/tg.html
-    TEXT=$(< "$PWD"/working/tg.html)
+    } >> ~/dumpyara/tg.html
+    TEXT=$(< ~/dumpyara/tg.html)
     curl -s "https://api.telegram.org/bot${TG_TOKEN}/sendmessage" --data "text=${TEXT}&chat_id=${CHAT_ID}&parse_mode=HTML&disable_web_page_preview=True" > /dev/null
-    rm -rf "$PWD"/working/tg.html
+    rm -rf ~/dumpyara/tg.html
 fi
