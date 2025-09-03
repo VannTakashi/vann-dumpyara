@@ -489,11 +489,17 @@ if [[ -n $GIT_OAUTH_TOKEN ]]; then
     if [[ -z "$(git config --get user.name)" ]]; then
         git config user.name VannXaveroo
     fi
-    curl -s -X POST -H "Authorization: token ${GIT_OAUTH_TOKEN}" -d '{ "name": "'"$repo"'" }' "https://api.github.com/orgs/${ORG}/repos" #create new repo
-    curl -s -X PUT -H "Authorization: token ${GIT_OAUTH_TOKEN}" -H "Accept: application/vnd.github.mercy-preview+json" -d '{ "names": ["'"$manufacturer"'","'"$platform"'","'"$top_codename"'"]}' "https://api.github.com/repos/${ORG}/${repo}/topics"
+    git lfs install
+    curl -s -X POST -H "Authorization: token ${GIT_OAUTH_TOKEN}" -d '{ "name": "'"$repo"'" }' "https://api.github.com/orgs/${ORG}/repos"
+    curl -s -X PUT -H "Authorization: token ${GIT_OAUTH_TOKEN}" -H "Accept: application/vnd.github.mercy-preview+json" \
+        -d '{ "names": ["'"$manufacturer"'","'"$platform"'","'"$top_codename"'"]}' \
+        "https://api.github.com/repos/${ORG}/${repo}/topics"
     git remote add origin https://github.com/$ORG/"${repo,,}".git
     git checkout -b "$branch"
-    find . -size +97M -printf '%P\n' -o -name "*sensetime*" -printf '%P\n' -o -name "*.lic" -printf '%P\n' >| .gitignore
+    find . -size +100M -printf '%P\n' | while read file; do
+    git lfs track "$file"
+    done
+    git add .gitattributes
     git add --all
     git commit -asm "Add ${description}"
     git update-ref -d HEAD
@@ -514,6 +520,7 @@ if [[ -n $GIT_OAUTH_TOKEN ]]; then
     git commit -asm "Add product priv-app for ${description}" && "${GITPUSH[@]}"
     git add product/
     git commit -asm "Add product for ${description}" && "${GITPUSH[@]}"
+    
 else
     LOGI "Dump done locally."
     exit 1
