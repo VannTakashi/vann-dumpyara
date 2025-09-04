@@ -115,7 +115,7 @@ else
     fi
 fi
 
-ORG=Xiaomeme-ROMs-Dumps #your GitHub org name
+ORG=DumpsVaults #your GitHub org name
 EXTENSION=$(echo "${INPUT##*.}" | inline-detox)
 UNZIP_DIR=$(basename ${INPUT/.$EXTENSION/})
 WORKING=${PWD}/working/${UNZIP_DIR}
